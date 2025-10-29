@@ -52,7 +52,9 @@ export default function CalculatorForm({ onCompare }) {
     <form onSubmit={handleSubmit} className="card p-4 shadow-sm">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h5 className="mb-0">Entradas</h5>
-        <button type="button" className="btn btn-link p-0" onClick={() => setShowInfo(true)}>O que é isso?</button>
+        <button type="button" className="btn btn-link p-0" onClick={() => setShowInfo(true)}>
+          <img src="/src/images/info-circle.svg" alt="Informações" />
+        </button>
       </div>
 
       <div className="mb-3">
@@ -106,21 +108,4 @@ export default function CalculatorForm({ onCompare }) {
 
       <InfoModal show={showInfo} onHide={() => setShowInfo(false)} />
     </form>
-  );
-}
-const enviarEmail = async () => {
-  const dadosEmail = {
-    para: emailUsuario,
-    assunto: "Simulação de Tributação",
-    mensagem: `Segue o resultado da sua simulação:\n\nRenda: R$ ${renda}\nCustos: R$ ${custos}`,
-  };
-
-  const resposta = await fetch("http://localhost:8080/email/enviar", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(dadosEmail),
-  });
-
-  const texto = await resposta.text();
-  alert(texto);
-};
+  );}

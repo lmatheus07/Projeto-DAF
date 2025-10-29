@@ -34,22 +34,40 @@ export const SIMPLES_ANEXO_III = [
   { upToAnnual: 4800000, rate: 0.33, deduction: 648000 }
 ];
 
+// Constantes para cálculos PJ
+const PROLABORE_PERCENTAGE = 0.28; // 28% da renda
+const INSS_RATE = 0.11; // 11% sobre pró-labore
+
 export function calcSimples(faturamentoMensal, custosMensais) {
   const receitaAnual = faturamentoMensal * 12;
-  let faixa = SIMPLES_ANEXO_III [SIMPLES_ANEXO_III.length - 1];
+  let faixa = SIMPLES_ANEXO_III[SIMPLES_ANEXO_III.length - 1];
   for (const f of SIMPLES_ANEXO_III) {
     if (receitaAnual <= f.upToAnnual) {
       faixa = f;
       break;
     }
   }
-  // cálculo simplificado: alíquota * faturamento - dedução anual/12
+  
+  // Cálculo do Simples Nacional
   const impostoAnual = Math.max(0, receitaAnual * faixa.rate - (faixa.deduction || 0));
   const impostoMensal = impostoAnual / 12;
-  const base = faturamentoMensal - custosMensais; // base interpretativa
-  const effectiveRate = impostoMensal / (faturamentoMensal || 1);
+  
+  // Cálculo do pró-labore e INSS
+  const prolabore = faturamentoMensal * PROLABORE_PERCENTAGE;
+  const inss = prolabore * INSS_RATE;
+  
+  // Base de cálculo para IR (pró-labore - INSS)
+  const baseIR = prolabore - inss;
+  const irProlabore = calcIRPF(baseIR);
+  
+  const effectiveRate = (impostoMensal + inss + irProlabore.imposto) / (faturamentoMensal || 1);
+  
   return {
     impostoMensal: round2(impostoMensal),
+    prolabore: round2(prolabore),
+    inss: round2(inss),
+    irProlabore: irProlabore,
+    totalImpostos: round2(impostoMensal + inss + irProlabore.imposto),
     effectiveRate: round2(effectiveRate),
     faixa
   };
@@ -67,7 +85,7 @@ export function compareTaxes({ rendaMensal, custosMensais }) {
 
   // Resultado final: liquido após imposto
   const liquidoPF = round2(rendaMensal - irpf.imposto);
-  const liquidoPJ = round2(rendaMensal - simples.impostoMensal);
+  const liquidoPJ = round2(rendaMensal - simples.totalImpostos);
 
   return {
     input: { rendaMensal, custosMensais },
@@ -75,11 +93,16 @@ export function compareTaxes({ rendaMensal, custosMensais }) {
       base: round2(basePF),
       imposto: irpf.imposto,
       effectiveRate: irpf.effectiveRate,
-      liquido: liquidoPF
+      liquido: liquidoPF,
+      bracket: irpf.bracket
     },
     PJ: {
       faturamento: rendaMensal,
-      imposto: simples.impostoMensal,
+      impostoMensal: simples.impostoMensal,
+      prolabore: simples.prolabore,
+      inss: simples.inss,
+      irProlabore: simples.irProlabore,
+      totalImpostos: simples.totalImpostos,
       effectiveRate: simples.effectiveRate,
       liquido: liquidoPJ,
       faixa: simples.faixa
