@@ -9,11 +9,15 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "sass": "^1.93.3",
     "vite": "^7.1.7"
   },
   "dependencies": {
+    "animate.css": "^4.1.1",
+    "bootstrap": "^5.3.8",
     "react": "^19.2.0",
     "react-bootstrap": "^2.10.10",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.9.5"
   }
 }

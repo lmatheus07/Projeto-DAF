@@ -1,25 +1,16 @@
-import React, { useState } from "react";
-import Header from "./components/Header";
-import CalculatorForm from "./components/CalculatorForm";
-import CompareResult from "./components/CompareResult";
+import React from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Home from "./pages/Home";
 
 export default function App() {
-  const [result, setResult] = useState(null);
-
-  function handleCompare(res) {
-    setResult(res);
-  }
-
-  function handleSendEmailNAF(payload) {
-    // callback opcional para quando CompareResult 'envia' ao NAF
-    console.log("Enviar ao NAF: ", payload);
-  }
-
   return (
-    <div className="container mt-4">
-      <Header />
-      <CalculatorForm onCompare={handleCompare} />
-      <CompareResult result={result} onSendEmailNAF={handleSendEmailNAF} />
-    </div>
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/home" element={<Home />} />
+      <Route path="/" element={<Navigate to="/login" replace />} />
+    </Routes>
   );
 }
